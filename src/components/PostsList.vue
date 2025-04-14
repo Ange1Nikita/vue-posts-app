@@ -41,7 +41,7 @@
       <div v-for="post in filteredPosts" :key="post.id" class="col-md-6 mb-4">
         <div class="card h-100 cursor-pointer" @click="openPost(post)">
           <div class="card-body">
-            <h5 class="card-title">{{ post.title }}</h5>
+            <h5 class="card-title" v-html="highlightText(post.title)"></h5>
             <p class="card-text">{{ truncateText(post.body, 100) }}</p>
             <p class="card-text">
               <small class="text-muted"><strong>Автор:</strong> {{ getUserName(post.userId) }}</small>
@@ -149,6 +149,15 @@ export default defineComponent({
       selectedPost.value = null
     }
 
+    const highlightText = (text: string): string => {
+      if (!searchQuery.value.trim()) return text
+      
+      const searchTerm = searchQuery.value.trim().toLowerCase()
+      const regex = new RegExp(`(${searchTerm})`, 'gi')
+      
+      return text.replace(regex, '<span class="highlight">$1</span>')
+    }
+
     onMounted(() => {
       fetchPosts()
       fetchUsers()
@@ -166,7 +175,8 @@ export default defineComponent({
       showModal,
       selectedPost,
       openPost,
-      closeModal
+      closeModal,
+      highlightText
     }
   }
 })
@@ -208,6 +218,14 @@ export default defineComponent({
       font-size: 1.1rem;
       font-weight: 500;
       margin-bottom: 1rem;
+
+      :deep(.highlight) {
+        background-color: #fff3cd;
+        padding: 0.1rem 0.2rem;
+        border-radius: 3px;
+        font-weight: bold;
+        color: #856404;
+      }
     }
 
     .card-text {
